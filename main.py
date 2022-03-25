@@ -26,10 +26,9 @@ algo_list = {
         'Historical UCB': historical_ucb.HistoricalUCB(mean_arms, dataset, n_arms),
         'Ignorant UCB': ucb.UCB(mean_arms, dataset, n_arms),
         'Ignorant Thompson Sampling': thompson_sampling.ThompsonSampling(mean_arms, dataset, n_arms),
-        'Historical Thompson Sampling': historical_thompson_sampling.ThompsonSampling(mean_arms, dataset, n_arms),
+        'Historical Thompson Sampling': historical_thompson_sampling.HistoricalThompsonSampling(mean_arms, dataset, n_arms),
         'Pseudo Online UCB': online_wrapper.OnlineWrapper(mean_arms, dataset, n_arms, ucb.UCB(mean_arms, dataset, n_arms)),
         'Pseudo Online TS': online_wrapper.OnlineWrapper(mean_arms, dataset, n_arms, thompson_sampling.ThompsonSampling(mean_arms, dataset, n_arms)),
-
     }
 
 online_ucb_use_all_data_count = 0.0
@@ -41,7 +40,7 @@ for i in range(num_iters):
     for algo in algo_list:
         algorithm = algo_list[algo]
         algorithm.reset(dataset)
-    
+
     for t in range(T+n):
         for algo in algo_list:
             algorithm = algo_list[algo]
