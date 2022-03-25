@@ -19,6 +19,7 @@ class OnlineWrapper(Algorithm):
     def reset(self, dataset):
         self.regret = 0 # resets all of the quantities
         self.regret_iterations = 0
+        self.dataset = dataset
         self.dataset_index = np.zeros(self.num_arms)
         self.algorithm.reset(dataset)
 
@@ -31,7 +32,7 @@ class OnlineWrapper(Algorithm):
 
         # Check if we have value in dataset that we can use and feed back to algorithm
         if self.dataset_index[action] < len(self.dataset[str(action)]):
-            obs = self.dataset[str(action)][self.dataset_index[action]] # gets a value from the dataset
+            obs = self.dataset[str(action)][int(self.dataset_index[action])]# gets a value from the dataset
             self.dataset_index[action] += 1 # updates index within the dataset
         else:
         # Otherwise, take online sample:
