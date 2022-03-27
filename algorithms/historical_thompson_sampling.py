@@ -18,13 +18,8 @@ class HistoricalThompsonSampling(ThompsonSampling): # inherits the original TS a
         self.beta = np.zeros(self.num_arms)
         self.num_arms = num_arms
         for i in range(self.num_arms):
-            _, counts = np.unique(dataset[str(i)], return_counts=True)
-            if len(counts) > 0:
-                self.alpha[i] = counts[1]
-                self.beta[i] = counts[0]
-            else:
-                self.alpha[i] = 0
-                self.beta[i] = 0
+            self.alpha[i] = 1 + np.sum(dataset[str(i)])
+            self.beta[i] = 1 + len(dataset[str(i)]) - np.sum(dataset[str(i)])
         self.regret = 0
         self.regret_iterations = 0
 
@@ -33,11 +28,5 @@ class HistoricalThompsonSampling(ThompsonSampling): # inherits the original TS a
         self.regret_iterations = 0
             # similar difference in the reset function
         for i in range(self.num_arms):
-            _, counts = np.unique(dataset[str(i)], return_counts=True)
-            if len(counts) > 0:
-                self.alpha[i] = counts[1]
-                self.beta[i] = counts[0]
-
-            else:
-                self.alpha[i] = 0
-                self.beta[i] = 0
+            self.alpha[i] = 1 + np.sum(dataset[str(i)])
+            self.beta[i] = 1 + len(dataset[str(i)]) - np.sum(dataset[str(i)])

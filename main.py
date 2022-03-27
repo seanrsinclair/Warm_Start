@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from algorithms import historical_ucb, ucb, online_wrapper, thompson_sampling, historical_thompson_sampling
+from algorithms import historical_ucb, ucb, online_wrapper, thompson_sampling, historical_thompson_sampling, ids, historical_ids
 from common import generate_dataset
 
 # initialize params
@@ -29,6 +29,9 @@ algo_list = {
         'Historical Thompson Sampling': historical_thompson_sampling.HistoricalThompsonSampling(mean_arms, dataset, n_arms),
         'Pseudo Online UCB': online_wrapper.OnlineWrapper(mean_arms, dataset, n_arms, ucb.UCB(mean_arms, dataset, n_arms)),
         'Pseudo Online TS': online_wrapper.OnlineWrapper(mean_arms, dataset, n_arms, thompson_sampling.ThompsonSampling(mean_arms, dataset, n_arms)),
+        'IDS': ids.IDS(mean_arms, dataset, n_arms, False),
+        'Historical IDS': historical_ids.HistoricalIDS(mean_arms, dataset, n_arms, False),
+        'Pseudo Online IDS': online_wrapper.OnlineWrapper(mean_arms, dataset, n_arms, ids.IDS(mean_arms, dataset, n_arms, False))
     }
 
 online_ucb_use_all_data_count = 0.0

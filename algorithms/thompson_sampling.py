@@ -1,6 +1,6 @@
 import numpy as np
 from .algorithm import Algorithm
-from .common import conf_r
+from .common import conf_r, rd_argmax
 
 class ThompsonSampling(Algorithm):
     '''
@@ -27,11 +27,9 @@ class ThompsonSampling(Algorithm):
         self.beta = np.ones(self.num_arms)
 
     def update_obs(self, action, reward_obs):
-        if reward_obs == 1:
-            self.alpha[action] += 1
-        else:
-            self.beta[action] += 1
+        self.alpha[action] += reward_obs
+        self.beta[action] += (1 - reward_obs)
 
     def pick_action(self, t):
         samples_list = [np.random.beta(self.alpha[i], self.beta[i]) for i in range(self.num_arms)]
-        return np.argmax(samples_list) # returns the argmax
+        return rd_argmax(samples_list) # returns the argmax

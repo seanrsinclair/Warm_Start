@@ -1,6 +1,6 @@
 import numpy as np
 from .algorithm import Algorithm
-from .common import conf_r
+from .common import conf_r, rd_argmax
 
 class UCB(Algorithm):
     '''
@@ -33,4 +33,4 @@ class UCB(Algorithm):
     def pick_action(self, t):
         ucb = np.asarray([self.means[i] + conf_r(t, self.selection[i]) if self.selection[i] > 0 else np.inf for i in range(self.num_arms)])   
             # calculates the UCB
-        return np.argmax(ucb) # returns the argmax
+        return rd_argmax(ucb) # returns the argmax
