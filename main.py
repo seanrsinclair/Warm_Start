@@ -9,8 +9,8 @@ from common import generate_dataset_two_arms, Environment
 # initialize params
 seed = 294
 
-num_iters = 50
-K = 5     # num arms
+num_iters = 20
+K = 20     # num arms
 T = 1000  # time horizon
 N = 200   # num historical samples
 
@@ -24,8 +24,6 @@ np.random.seed(seed)
 regret_data = []
 
 mean_arms, dataset = None, None # generates unused dataset just to initialize the various algorithms
-
-
 
 online_ucb_use_all_data_count = 0.0
 online_ucb_data_use_percentage = []
@@ -41,16 +39,18 @@ for iter in range(num_iters):
     print('-------------------')
     print(f'iteration {iter}, means {np.round(mean_arms, 3)}')
 
+
+
     algo_list = {
-            'Historical UCB':               historical_ucb.HistoricalUCB(mean_arms, dataset, K),
-            'Ignorant UCB':                 ucb.UCB(mean_arms, dataset, K),
-            'Ignorant Thompson Sampling':   thompson_sampling.ThompsonSampling(mean_arms, dataset, K),
-            'Historical Thompson Sampling': historical_thompson_sampling.HistoricalThompsonSampling(mean_arms, dataset, K),
-            'Pseudo Online UCB':            online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ucb.UCB(mean_arms, dataset, K)),
-            'Pseudo Online TS':             online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, thompson_sampling.ThompsonSampling(mean_arms, dataset, K)),
-            'IDS':                          ids.IDS(mean_arms, dataset, K, False),
-            'Historical IDS':               historical_ids.HistoricalIDS(mean_arms, dataset, K, False),
-            'Pseudo Online IDS':            online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ids.IDS(mean_arms, dataset, K, False))
+            'Ignorant UCB':      ucb.UCB(mean_arms, dataset, K),
+            'Historical UCB':    historical_ucb.HistoricalUCB(mean_arms, dataset, K),
+            'Pseudo Online UCB': online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ucb.UCB(mean_arms, dataset, K)),
+            'Ignorant TS':       thompson_sampling.ThompsonSampling(mean_arms, dataset, K),
+            'Historical TS':     historical_thompson_sampling.HistoricalThompsonSampling(mean_arms, dataset, K),
+            'Pseudo Online TS':  online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, thompson_sampling.ThompsonSampling(mean_arms, dataset, K)),
+            'IDS':               ids.IDS(mean_arms, dataset, K, False),
+            'Historical IDS':    historical_ids.HistoricalIDS(mean_arms, dataset, K, False),
+            'Pseudo Online IDS': online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ids.IDS(mean_arms, dataset, K, False))
         }
 
     # for algo in algo_list:
@@ -73,14 +73,16 @@ for iter in range(num_iters):
     online_ucb_data_use_percentage.append(pseudo_online_ucb.history_use_percentage())
 
 print('----------------------------')
-print('Stats from online algorithm')
+print('Stats from online algorithm (pseudo online UCB)')
 print(f'  Percentage of trials entire dataset used:   {100 * online_ucb_use_all_data_count / num_iters}')
 print(f'  Average percentage of historical data used: {100 * np.mean(online_ucb_data_use_percentage):.2f}')
 
+palette = ['darkgreen', 'lime', 'seagreen', 'mediumblue', 'royalblue', 'cornflowerblue', 'darkred', 'indianred', 'salmon']  # 'darkolivegreen', 'olivedrab', 'yellowgreen'
 
+hue_order = ['Ignorant UCB', 'Historical UCB', 'Pseudo Online UCB', 'Ignorant TS', 'Historical TS', 'Pseudo Online TS', 'IDS', 'Historical IDS', 'Pseudo Online IDS']
 
 df = pd.DataFrame(regret_data)
-p = sns.lineplot(data = df, x='t', y='Regret', hue='Algo', ci='sd') # ci=None) #, ci='sd')
+p = sns.lineplot(data = df, hue_order=hue_order, x='t', y='Regret', hue='Algo', palette=palette, ci=None) # ci=None) #, ci='sd')
 p.set_title(f'K = {K}, N = {N}')
 # p.set_title(f'K = {K}, N = {N}, delta = {delta}, alpha = {alpha}')
 plt.show()
