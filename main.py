@@ -23,15 +23,15 @@ regret_data = []
 
 dataset = generate_dataset(0, mean_arms, alpha) # generates unused dataset just to initialize the various algorithms
 algo_list = {
-        'Historical UCB': historical_ucb.HistoricalUCB(mean_arms, dataset, n_arms),
-        'Ignorant UCB': ucb.UCB(mean_arms, dataset, n_arms),
-        'Ignorant Thompson Sampling': thompson_sampling.ThompsonSampling(mean_arms, dataset, n_arms),
+        'Historical UCB':               historical_ucb.HistoricalUCB(mean_arms, dataset, n_arms),
+        'Ignorant UCB':                 ucb.UCB(mean_arms, dataset, n_arms),
+        'Ignorant Thompson Sampling':   thompson_sampling.ThompsonSampling(mean_arms, dataset, n_arms),
         'Historical Thompson Sampling': historical_thompson_sampling.HistoricalThompsonSampling(mean_arms, dataset, n_arms),
-        'Pseudo Online UCB': online_wrapper.OnlineWrapper(mean_arms, dataset, n_arms, ucb.UCB(mean_arms, dataset, n_arms)),
-        'Pseudo Online TS': online_wrapper.OnlineWrapper(mean_arms, dataset, n_arms, thompson_sampling.ThompsonSampling(mean_arms, dataset, n_arms)),
-        'IDS': ids.IDS(mean_arms, dataset, n_arms, False),
-        'Historical IDS': historical_ids.HistoricalIDS(mean_arms, dataset, n_arms, False),
-        'Pseudo Online IDS': online_wrapper.OnlineWrapper(mean_arms, dataset, n_arms, ids.IDS(mean_arms, dataset, n_arms, False))
+        'Pseudo Online UCB':            online_wrapper.OnlineWrapper(mean_arms, dataset, n_arms, ucb.UCB(mean_arms, dataset, n_arms)),
+        'Pseudo Online TS':             online_wrapper.OnlineWrapper(mean_arms, dataset, n_arms, thompson_sampling.ThompsonSampling(mean_arms, dataset, n_arms)),
+        'IDS':                          ids.IDS(mean_arms, dataset, n_arms, False),
+        'Historical IDS':               historical_ids.HistoricalIDS(mean_arms, dataset, n_arms, False),
+        'Pseudo Online IDS':            online_wrapper.OnlineWrapper(mean_arms, dataset, n_arms, ids.IDS(mean_arms, dataset, n_arms, False))
     }
 
 online_ucb_use_all_data_count = 0.0
@@ -47,7 +47,7 @@ for i in range(num_iters):
     for t in range(T+n):
         for algo in algo_list:
             algorithm = algo_list[algo]
-            if algorithm.regret_iterations < T: # if the algorithm is not yet finished 
+            if algorithm.regret_iterations < T: # if the algorithm is not yet finished
                 flag = algorithm.one_step(algorithm.regret_iterations) # run a one-step update of getting arm, observation, and calculating regret
                 if flag: regret_data.append({'Algo': algo, 'Iter': i, 't': algorithm.regret_iterations, 'Regret': algorithm.regret}) # add on its regret to the dataset
 
@@ -55,13 +55,13 @@ for i in range(num_iters):
     pseudo_online_ucb = algo_list['Pseudo Online UCB']
     if pseudo_online_ucb.dataset_index[0] == len(dataset['0']) and pseudo_online_ucb.dataset_index[1] == len(dataset['1']):
         online_ucb_use_all_data_count += 1
-    
+
     online_ucb_data_use_percentage.append((pseudo_online_ucb.dataset_index[0] + pseudo_online_ucb.dataset_index[1]) / n)
 
 print('----------------------------')
 print('Stats from online algorithm')
 print(f'  Percentage of trials entire dataset used:   {100 * online_ucb_use_all_data_count / num_iters}')
-print(f'  Average percentage of historical data used: {100*np.mean(online_ucb_data_use_percentage):.2f}')
+print(f'  Average percentage of historical data used: {100 * np.mean(online_ucb_data_use_percentage):.2f}')
 
 
 
