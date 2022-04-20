@@ -12,14 +12,13 @@ class HistoricalThompsonSampling(ThompsonSampling): # inherits the original TS a
     def __init__(self, true_means, dataset, num_arms):
         self.dataset = dataset
         self.true_means = true_means
-        self.num_arms = num_arms
+        self.K = num_arms
             # same as original algorithm but updates the alpha and beta parameters from the dataset
-        self.alpha = np.zeros(self.num_arms)
-        self.beta = np.zeros(self.num_arms)
-        self.num_arms = num_arms
-        for i in range(self.num_arms):
-            self.alpha[i] = 1 + np.sum(dataset[str(i)])
-            self.beta[i] = 1 + len(dataset[str(i)]) - np.sum(dataset[str(i)])
+        self.alpha = np.zeros(self.K)
+        self.beta = np.zeros(self.K)
+        for k in range(self.K):
+            self.alpha[k] = 1 + np.sum(dataset[k])
+            self.beta[k] = 1 + len(dataset[k]) - np.sum(dataset[k])
         self.regret = 0
         self.regret_iterations = 0
 
@@ -27,6 +26,6 @@ class HistoricalThompsonSampling(ThompsonSampling): # inherits the original TS a
         self.regret = 0
         self.regret_iterations = 0
             # similar difference in the reset function
-        for i in range(self.num_arms):
-            self.alpha[i] = 1 + np.sum(dataset[str(i)])
-            self.beta[i] = 1 + len(dataset[str(i)]) - np.sum(dataset[str(i)])
+        for k in range(self.K):
+            self.alpha[k] = 1 + np.sum(dataset[k])
+            self.beta[k] = 1 + len(dataset[k]) - np.sum(dataset[k])

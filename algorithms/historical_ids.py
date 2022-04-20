@@ -9,12 +9,9 @@ class HistoricalIDS(IDS):
         Implementation of the IDS algorithm which is agnostic of the dataset
         param VIDS: boolean, if True choose arm which delta**2/v quantity. Default: False
     '''
-    def __init__(self, true_means, dataset, num_arms, VIDS=False):
-
-
-
+    def __init__(self, true_means, dataset, K, VIDS=False):
         self.dataset = dataset # save the dataset (although is ignored)
-        self.num_arms = num_arms
+        self.K = K
         self.true_means = true_means
         self.VIDS = VIDS
 
@@ -24,24 +21,24 @@ class HistoricalIDS(IDS):
         self.regret_iterations = 0 # and current index in the regret
 
         self.flag = False
-        self.alpha = np.ones(self.num_arms) # initializes posterior alpha and beta
-        self.beta = np.ones(self.num_arms)
-        for i in range(self.num_arms):
-            self.alpha[i] = 1 + np.sum(dataset[str(i)])
-            self.beta[i] = 1 + len(dataset[str(i)]) - np.sum(dataset[str(i)])
+        self.alpha = np.ones(self.K) # initializes posterior alpha and beta
+        self.beta = np.ones(self.K)
+        for k in range(self.K):
+            self.alpha[k] = 1 + np.sum(dataset[k])
+            self.beta[k] = 1 + len(dataset[k]) - np.sum(dataset[k])
 
-        self.thetas = np.array([np.random.beta(self.alpha[arm], self.beta[arm], self.M) for arm in range(self.num_arms)])
-        self.Maap, self.p_a = np.zeros((self.num_arms, self.num_arms)), np.zeros(self.num_arms)
+        self.thetas = np.array([np.random.beta(self.alpha[k], self.beta[k], self.M) for k in range(self.K)])
+        self.Maap, self.p_a = np.zeros((self.K, self.K)), np.zeros(self.K)
 
     def reset(self, dataset):
         self.regret = 0 # resets the estimates back to zero
         self.regret_iterations = 0
 
         self.flag = False
-        self.alpha = np.ones(self.num_arms) # initializes posterior alpha and beta
-        self.beta = np.ones(self.num_arms)
-        for i in range(self.num_arms):
-            self.alpha[i] = 1 + np.sum(dataset[str(i)])
-            self.beta[i] = 1 + len(dataset[str(i)]) - np.sum(dataset[str(i)])
-        self.thetas = np.array([np.random.beta(self.alpha[arm], self.beta[arm], self.M) for arm in range(self.num_arms)])
-        self.Maap, self.p_a = np.zeros((self.num_arms, self.num_arms)), np.zeros(self.num_arms)
+        self.alpha = np.ones(self.K) # initializes posterior alpha and beta
+        self.beta = np.ones(self.K)
+        for k in range(self.K):
+            self.alpha[k] = 1 + np.sum(dataset[k])
+            self.beta[k] = 1 + len(dataset[k]) - np.sum(dataset[k])
+        self.thetas = np.array([np.random.beta(self.alpha[k], self.beta[k], self.M) for k in range(self.K)])
+        self.Maap, self.p_a = np.zeros((self.K, self.K)), np.zeros(self.K)

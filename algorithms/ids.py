@@ -9,7 +9,7 @@ class IDS(Algorithm):
     '''
     def __init__(self, true_means, dataset, num_arms, VIDS=False):
         self.dataset = dataset # save the dataset (although is ignored)
-        self.num_arms = num_arms
+        self.K = num_arms
         self.true_means = true_means
         self.VIDS = VIDS
 
@@ -19,10 +19,10 @@ class IDS(Algorithm):
         self.regret_iterations = 0 # and current index in the regret
 
         self.flag = False
-        self.alpha = np.ones(self.num_arms) # initializes posterior alpha and beta
-        self.beta = np.ones(self.num_arms)
-        self.thetas = np.array([np.random.beta(self.alpha[arm], self.beta[arm], self.M) for arm in range(self.num_arms)])
-        self.Maap, self.p_a = np.zeros((self.num_arms, self.num_arms)), np.zeros(self.num_arms)
+        self.alpha = np.ones(self.K) # initializes posterior alpha and beta
+        self.beta = np.ones(self.K)
+        self.thetas = np.array([np.random.beta(self.alpha[k], self.beta[k], self.M) for k in range(self.K)])
+        self.Maap, self.p_a = np.zeros((self.K, self.K)), np.zeros(self.K)
 
 
     def reset(self, dataset):
@@ -30,10 +30,10 @@ class IDS(Algorithm):
         self.regret_iterations = 0
 
         self.flag = False
-        self.alpha = np.ones(self.num_arms) # initializes posterior alpha and beta
-        self.beta = np.ones(self.num_arms)
-        self.thetas = np.array([np.random.beta(self.alpha[arm], self.beta[arm], self.M) for arm in range(self.num_arms)])
-        self.Maap, self.p_a = np.zeros((self.num_arms, self.num_arms)), np.zeros(self.num_arms)
+        self.alpha = np.ones(self.K) # initializes posterior alpha and beta
+        self.beta = np.ones(self.K)
+        self.thetas = np.array([np.random.beta(self.alpha[k], self.beta[k], self.M) for k in range(self.K)])
+        self.Maap, self.p_a = np.zeros((self.K, self.K)), np.zeros(self.K)
 
     def update_obs(self, action, reward_obs):
         self.alpha[action] += reward_obs
@@ -52,19 +52,19 @@ class IDS(Algorithm):
         :param g: np.array, information gains
         :return: int, arm to pull
         """
-        Q = np.zeros((self.num_arms, self.num_arms))
-        IR = np.ones((self.num_arms, self.num_arms)) * np.inf
+        Q = np.zeros((self.K, self.K))
+        IR = np.ones((self.K, self.K)) * np.inf
         q = np.linspace(0, 1, 1000)
-        for a in range(self.num_arms - 1):
-            for ap in range(a + 1, self.num_arms):
+        for a in range(self.K - 1):
+            for ap in range(a + 1, self.K):
                 if g[a] < 1e-6 or g[ap] < 1e-6:
                     return rd_argmax(-g)
                 da, dap, ga, gap = delta[a], delta[ap], g[a], g[ap]
                 qaap = q[rd_argmax(-(q * da + (1 - q) * dap) ** 2 / (q * ga + (1 - q) * gap))]
                 IR[a, ap] = (qaap * (da - dap) + dap) ** 2 / (qaap * (ga - gap) + gap)
                 Q[a, ap] = qaap
-        amin = rd_argmax(-IR.reshape(self.num_arms * self.num_arms))
-        a, ap = amin // self.num_arms, amin % self.num_arms
+        amin = rd_argmax(-IR.reshape(self.K * self.K))
+        a, ap = amin // self.K, amin % self.K
         b = np.random.binomial(1, Q[a, ap])
         arm = int(b * a + (1 - b) * ap)
         return arm
@@ -82,9 +82,9 @@ class IDS(Algorithm):
         :return: int, np.array, arm chose and p*
         """
         mu, theta_hat = np.mean(self.thetas, axis=1), np.argmax(self.thetas, axis=0)
-        for a in range(self.num_arms):
+        for a in range(self.K):
             mu[a] = np.mean(self.thetas[a])
-            for ap in range(self.num_arms):
+            for ap in range(self.K):
                 t = self.thetas[ap, np.where(theta_hat == a)]
                 self.Maap[ap, a] = np.nan_to_num(np.mean(t))
                 if ap == a:
@@ -94,16 +94,16 @@ class IDS(Algorithm):
             self.optimal_arm = np.argmax(self.p_a)
             arm = self.optimal_arm
         else:
-            rho_star = sum([self.p_a[a] * self.Maap[a, a] for a in range(self.num_arms)])
+            rho_star = sum([self.p_a[a] * self.Maap[a, a] for a in range(self.K)])
             delta = rho_star - mu
             if self.VIDS:
-                v = np.array([sum([self.p_a[ap] * (self.Maap[a, ap] - mu[a]) ** 2 for ap in range(self.num_arms)])
-                              for a in range(self.num_arms)])
+                v = np.array([sum([self.p_a[ap] * (self.Maap[a, ap] - mu[a]) ** 2 for ap in range(self.K)])
+                              for a in range(self.K)])
                 arm = rd_argmax(-delta ** 2 / v)
             else:
                 g = np.array([sum([self.p_a[ap] * (self.Maap[a, ap] * np.log(self.Maap[a, ap]/mu[a]+1e-10) +
                                               (1-self.Maap[a, ap]) * np.log((1-self.Maap[a, ap])/(1-mu[a])+1e-10))
-                                   for ap in range(self.num_arms)]) for a in range(self.num_arms)])
+                                   for ap in range(self.K)]) for a in range(self.K)])
                 arm = self.IDSAction(delta, g)
         return arm
 
@@ -125,6 +125,5 @@ class IDS(Algorithm):
             else:
                 action = self.computeIDS()
         else:
-            action = self.optimal_arm        
+            action = self.optimal_arm
         return action
-

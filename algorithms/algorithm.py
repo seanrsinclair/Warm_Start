@@ -7,7 +7,7 @@ class Algorithm(object):
         - update_obs (update estimates based on observed reward)
         - selecting an action
         - one-step (performs a one-step loop of picking an arm, getting sample, calculating regret)
-    
+
     '''
     def __init__(self, true_means, dataset, num_arms):
         self.dataset = dataset
@@ -15,12 +15,10 @@ class Algorithm(object):
         self.regret = 0
         self.num_arms = num_arms
         self.regret_iterations = 0
-        pass
 
     def reset(self, dataset):
         self.regret = 0
         self.regret_iterations = 0
-        pass
 
     def update_config(self, config):
         self.config = config

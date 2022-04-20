@@ -28,7 +28,6 @@ class Environment:
 
         # historical pulls
         self.history = {}
-        for k in range(K):
 
         historical_distrib = np.random.rand(K)  # distribution of pulls to each arm in history; not based on reward
         historical_distrib /= historical_distrib.sum()
