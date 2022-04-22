@@ -4,12 +4,12 @@ import pandas as pd
 import seaborn as sns
 
 from algorithms import historical_ucb, ucb, online_wrapper, thompson_sampling, historical_thompson_sampling, ids, historical_ids
-from common import generate_dataset_two_arms, Environment
+from common import generate_dataset_two_arms, Environment, SimpleEnvironment
 
 # initialize params
 seed = 294
 
-num_iters = 20
+num_iters = 5
 K = 20     # num arms
 T = 1000  # time horizon
 N = 200   # num historical samples
@@ -33,6 +33,7 @@ for iter in range(num_iters):
 
     # dataset = generate_dataset_two_arms(N, mean_arms, alpha)
     env = Environment(K, N)
+    # env = SimpleEnvironment(.05, 0, 10)
     dataset = env.history
     mean_arms = env.mean_arms
 

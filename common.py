@@ -13,6 +13,7 @@ def generate_dataset_two_arms(n, mean_arms, alpha):
     return dataset
 
 
+
 class Environment:
     def __init__(self, K, N):
         '''
@@ -57,3 +58,33 @@ class Environment:
         reward = self.history[k][self.history_pos[k]]
         self.history_pos[k] += 1
         return reward
+
+
+
+class SimpleEnvironment(Environment):
+    def __init__(self, delta, alpha, N):
+        '''
+        MAB simulator for 2-armed bandit with N historical samples
+
+        returns dictionary: k -> array of reward from historical pulls
+        '''
+        self.K = 2
+        self.N = N
+
+        # TODO: adjust means to be sorted on features
+        self.mean_arms = np.asarray([1/2, 1/2-delta])
+
+        # historical pulls
+        self.history = {}
+
+        historical_distrib = np.asarray([alpha, 1-alpha])  # distribution of pulls to each arm in history; not based on reward
+        arms_pulled = np.random.choice(self.K, size=N, p=historical_distrib)
+
+        for k in range(self.K):
+            num_pulls = np.sum(arms_pulled == k)
+            rewards = np.random.binomial(n=1, p=self.mean_arms[k], size=num_pulls)
+            self.history[k] = rewards
+
+        self.history_pos = np.zeros(self.K)  # track position of views in historical data
+
+        self.online_pulls = []  # tracker for online pulls
