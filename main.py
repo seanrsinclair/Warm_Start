@@ -9,11 +9,11 @@ from common import generate_dataset_two_arms, Environment, SimpleEnvironment
 # initialize params
 seed = 294
 
-num_iters = 5
+num_iters = 500
 K = 20     # num arms
 T = 1000  # time horizon
 N = 200   # num historical samples
-
+RESET_REWARD_FLAG = True
 # delta = 0.1
 # alpha = 0.5 # percentage of time to pull arm 0
 # mean_arms = [.5, .5-delta]  # note: arm 0 always better
@@ -32,7 +32,7 @@ online_ucb_data_use_percentage = []
 for iter in range(num_iters):
 
     # dataset = generate_dataset_two_arms(N, mean_arms, alpha)
-    env = Environment(K, N)
+    env = Environment(K, N, T)
     # env = SimpleEnvironment(.05, 0, 10)
     dataset = env.history
     mean_arms = env.mean_arms
@@ -46,17 +46,14 @@ for iter in range(num_iters):
             'Ignorant UCB':      ucb.UCB(mean_arms, dataset, K),
             'Historical UCB':    historical_ucb.HistoricalUCB(mean_arms, dataset, K),
             'Pseudo Online UCB': online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ucb.UCB(mean_arms, dataset, K)),
-            'Ignorant TS':       thompson_sampling.ThompsonSampling(mean_arms, dataset, K),
-            'Historical TS':     historical_thompson_sampling.HistoricalThompsonSampling(mean_arms, dataset, K),
-            'Pseudo Online TS':  online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, thompson_sampling.ThompsonSampling(mean_arms, dataset, K)),
-            'IDS':               ids.IDS(mean_arms, dataset, K, False),
-            'Historical IDS':    historical_ids.HistoricalIDS(mean_arms, dataset, K, False),
-            'Pseudo Online IDS': online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ids.IDS(mean_arms, dataset, K, False))
+            # 'Ignorant TS':       thompson_sampling.ThompsonSampling(mean_arms, dataset, K),
+            # 'Historical TS':     historical_thompson_sampling.HistoricalThompsonSampling(mean_arms, dataset, K),
+            # 'Pseudo Online TS':  online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, thompson_sampling.ThompsonSampling(mean_arms, dataset, K)),
+            # 'IDS':               ids.IDS(mean_arms, dataset, K, False),
+            # 'Historical IDS':    historical_ids.HistoricalIDS(mean_arms, dataset, K, False),
+            # 'Pseudo Online IDS': online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ids.IDS(mean_arms, dataset, K, False))
         }
 
-    # for algo in algo_list:
-    #     algorithm = algo_list[algo]
-    #     algorithm.reset(env.dataset, env.mean_arms)
 
     for t in range(T+N):
         for algo in algo_list:
@@ -64,6 +61,8 @@ for iter in range(num_iters):
             if algorithm.regret_iterations < T: # if the algorithm is not yet finished
                 flag = algorithm.one_step(algorithm.regret_iterations) # run a one-step update of getting arm, observation, and calculating regret
                 if flag: regret_data.append({'Algo': algo, 'Iter': iter, 't': algorithm.regret_iterations, 'Regret': algorithm.regret}) # add on its regret to the dataset
+        env.reset_algo()
+    env.reset_data(RESET_REWARD_FLAG)
 
     # meta trackers on behavior of online algorithm
     pseudo_online_ucb = algo_list['Pseudo Online UCB']

@@ -1,4 +1,5 @@
 import numpy as np
+from collections import Counter
 
 def generate_dataset_two_arms(n, mean_arms, alpha):
     '''
@@ -15,7 +16,7 @@ def generate_dataset_two_arms(n, mean_arms, alpha):
 
 
 class Environment:
-    def __init__(self, K, N):
+    def __init__(self, K, N, T):
         '''
         MAB simulator for K-armed bandit with N historical samples
 
@@ -23,6 +24,7 @@ class Environment:
         '''
         self.K = K
         self.N = N
+        self.T = T
 
         # TODO: adjust means to be sorted on features
         self.mean_arms = np.random.rand(K)
@@ -41,12 +43,21 @@ class Environment:
 
         self.history_pos = np.zeros(K)  # track position of views in historical data
 
+        self.online_data = {}
+        for k in range(K):
+            self.online_data[k] = np.random.binomial(n=1, p=self.mean_arms[k], size=self.T)
+
         self.online_pulls = []  # tracker for online pulls
+
 
 
     def pull_arm(self, k):
         ''' return observed reward from pulling arm k '''
-        reward = np.random.binomial(n=1, p=self.mean_arms[k])
+        
+        counter = Counter(e for e,_ in self.online_pulls)
+        num_samples = dict(counter)[k]
+        reward = self.online_data[k][num_samples+1]
+        # reward = np.random.binomial(n=1, p=self.mean_arms[k])
         self.online_pulls.append((k, reward))
 
 
@@ -58,6 +69,36 @@ class Environment:
         reward = self.history[k][self.history_pos[k]]
         self.history_pos[k] += 1
         return reward
+
+    def reset_algo(self):
+        self.online_pulls = []
+        self.history_pos = np.zeros(self.K)  # track position of views in historical data
+
+
+
+    def reset_data(self, reset_reward_flag = False):
+        if reset_reward_flag:
+            self.mean_arms = np.random.rand(self.K)
+
+            # historical pulls
+            self.history = {}
+
+            historical_distrib = np.random.rand(self.K)  # distribution of pulls to each arm in history; not based on reward
+            historical_distrib /= historical_distrib.sum()
+            arms_pulled = np.random.choice(self.K, size=self.N, p=historical_distrib)
+
+            for k in range(self.K):
+                num_pulls = np.sum(arms_pulled == k)
+                rewards = np.random.binomial(n=1, p=self.mean_arms[k], size=num_pulls)
+                self.history[k] = rewards
+
+            self.history_pos = np.zeros(self.K)  # track position of views in historical data
+
+
+        
+        self.online_data = {}
+        for k in range(self.K):
+            self.online_data[k] = np.random.binomial(n=1, p=self.mean_arms[k], size=self.T)
 
 
 
