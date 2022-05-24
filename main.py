@@ -9,11 +9,12 @@ from common import generate_dataset_two_arms, Environment, SimpleEnvironment
 # initialize params
 seed = 294
 
-num_iters = 500
+num_iters = 100
 K = 20     # num arms
 T = 1000  # time horizon
 N = 200   # num historical samples
 RESET_REWARD_FLAG = True
+MONOTONE_FLAG = True
 # delta = 0.1
 # alpha = 0.5 # percentage of time to pull arm 0
 # mean_arms = [.5, .5-delta]  # note: arm 0 always better
@@ -43,9 +44,9 @@ for iter in range(num_iters):
 
 
     algo_list = {
-            'Ignorant UCB':      ucb.UCB(mean_arms, dataset, K),
-            'Historical UCB':    historical_ucb.HistoricalUCB(mean_arms, dataset, K),
-            'Pseudo Online UCB': online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ucb.UCB(mean_arms, dataset, K)),
+            'Ignorant UCB':      ucb.UCB(mean_arms, dataset, K, MONOTONE_FLAG=MONOTONE_FLAG),
+            'Historical UCB':    historical_ucb.HistoricalUCB(mean_arms, dataset, K, MONOTONE_FLAG=MONOTONE_FLAG),
+            'Pseudo Online UCB': online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ucb.UCB(mean_arms, dataset, K, MONOTONE_FLAG=MONOTONE_FLAG)),
             # 'Ignorant TS':       thompson_sampling.ThompsonSampling(mean_arms, dataset, K),
             # 'Historical TS':     historical_thompson_sampling.HistoricalThompsonSampling(mean_arms, dataset, K),
             # 'Pseudo Online TS':  online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, thompson_sampling.ThompsonSampling(mean_arms, dataset, K)),
