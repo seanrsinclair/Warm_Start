@@ -93,8 +93,6 @@ class Environment:
                 self.history[k] = rewards
 
             self.history_pos = np.zeros(self.K)  # track position of views in historical data
-
-
         
         self.online_data = {}
         for k in range(self.K):
