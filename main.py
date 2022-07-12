@@ -52,12 +52,12 @@ for iter in range(num_iters):
             'Ignorant UCB':      ucb.UCB(T, mean_arms, dataset, K, MONOTONE_FLAG=MONOTONE_FLAG),
             'Historical UCB':    historical_ucb.HistoricalUCB(T, mean_arms, dataset, K, MONOTONE_FLAG=MONOTONE_FLAG),
             'Pseudo Online UCB': online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ucb.UCB(T, mean_arms, dataset, K, MONOTONE_FLAG=MONOTONE_FLAG)),
-            # 'Ignorant TS':       thompson_sampling.ThompsonSampling(mean_arms, dataset, K),
-            # 'Historical TS':     historical_thompson_sampling.HistoricalThompsonSampling(mean_arms, dataset, K),
-            # 'Pseudo Online TS':  online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, thompson_sampling.ThompsonSampling(mean_arms, dataset, K)),
-            # 'IDS':               ids.IDS(mean_arms, dataset, K, False),
-            # 'Historical IDS':    historical_ids.HistoricalIDS(mean_arms, dataset, K, False),
-            # 'Pseudo Online IDS': online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ids.IDS(mean_arms, dataset, K, False))
+            'Ignorant TS':       thompson_sampling.ThompsonSampling(mean_arms, dataset, K),
+            'Historical TS':     historical_thompson_sampling.HistoricalThompsonSampling(mean_arms, dataset, K),
+            'Pseudo Online TS':  online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, thompson_sampling.ThompsonSampling(mean_arms, dataset, K)),
+            'IDS':               ids.IDS(mean_arms, dataset, K, False),
+            'Historical IDS':    historical_ids.HistoricalIDS(mean_arms, dataset, K, False),
+            'Pseudo Online IDS': online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ids.IDS(mean_arms, dataset, K, False))
         }
 
 
