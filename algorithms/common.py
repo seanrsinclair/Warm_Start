@@ -1,9 +1,9 @@
 import numpy as np
 import random as rd
 
-def conf_r(t, n_pulls):
+def conf_r(T, t, n_pulls):
     """ compute confidence radius """
-    return np.sqrt(2*np.log(1+t) / n_pulls)
+    return np.sqrt(2*np.log(1+T) / n_pulls)
 
 def rd_argmax(vector):
     """

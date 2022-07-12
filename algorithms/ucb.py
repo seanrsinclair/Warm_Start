@@ -6,9 +6,10 @@ class UCB(Algorithm):
     '''
         Implementation of the UCB algorithm which is agnostic of the dataset
     '''
-    def __init__(self, true_means, dataset, K, MONOTONE_FLAG = False):
+    def __init__(self, T, true_means, dataset, K, MONOTONE_FLAG = False):
         self.dataset = dataset # save the dataset (although is ignored)
         self.K = K
+        self.horizon = T
         self.true_means = true_means
 
         self.means = np.zeros(self.K) # initializes estimates of the mean
@@ -32,9 +33,9 @@ class UCB(Algorithm):
 
     def pick_action(self, t):
         if self.MONOTONE_FLAG:
-            new_ucb = np.asarray([self.means[k] + conf_r(t, self.selection[k]) if self.selection[k] > 0 else np.inf for k in range(self.K)])
+            new_ucb = np.asarray([self.means[k] + conf_r(self.horizon, t, self.selection[k]) if self.selection[k] > 0 else np.inf for k in range(self.K)])
             self.ucb = np.minimum(self.ucb, new_ucb)
         else:
-            self.ucb = np.asarray([self.means[k] + conf_r(t, self.selection[k]) if self.selection[k] > 0 else np.inf for k in range(self.K)])
+            self.ucb = np.asarray([self.means[k] + conf_r(self.horizon, t, self.selection[k]) if self.selection[k] > 0 else np.inf for k in range(self.K)])
             # calculates the UCB
         return rd_argmax(self.ucb) # returns the argmax

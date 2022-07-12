@@ -49,9 +49,9 @@ for iter in range(num_iters):
         # Slightly harder solution: The UCB algo's take as imput the environment which maintains the "timestep", and the
         # UCB algo's use the confidence radius with log numerator being env.time_step(arm) or something like that.
     algo_list = {
-            'Ignorant UCB':      ucb.UCB(mean_arms, dataset, K, MONOTONE_FLAG=MONOTONE_FLAG),
-            'Historical UCB':    historical_ucb.HistoricalUCB(mean_arms, dataset, K, MONOTONE_FLAG=MONOTONE_FLAG),
-            'Pseudo Online UCB': online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ucb.UCB(mean_arms, dataset, K, MONOTONE_FLAG=MONOTONE_FLAG)),
+            'Ignorant UCB':      ucb.UCB(T, mean_arms, dataset, K, MONOTONE_FLAG=MONOTONE_FLAG),
+            'Historical UCB':    historical_ucb.HistoricalUCB(T, mean_arms, dataset, K, MONOTONE_FLAG=MONOTONE_FLAG),
+            'Pseudo Online UCB': online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, ucb.UCB(T, mean_arms, dataset, K, MONOTONE_FLAG=MONOTONE_FLAG)),
             # 'Ignorant TS':       thompson_sampling.ThompsonSampling(mean_arms, dataset, K),
             # 'Historical TS':     historical_thompson_sampling.HistoricalThompsonSampling(mean_arms, dataset, K),
             # 'Pseudo Online TS':  online_wrapper.OnlineWrapper(mean_arms, dataset, N, K, thompson_sampling.ThompsonSampling(mean_arms, dataset, K)),

@@ -9,7 +9,8 @@ class HistoricalUCB(UCB): # inherits the original UCB algorithm
         Implementation of the UCB algorithm which uses the historical dataset to start off
         the action selection frequencies and the means
     '''
-    def __init__(self, true_means, dataset, K, MONOTONE_FLAG = False):
+    def __init__(self, T, true_means, dataset, K, MONOTONE_FLAG = False):
+        self.horizon = T
         self.dataset = dataset
         self.true_means = true_means
         self.K = K
